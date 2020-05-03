@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <title>这只是一个测试</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <style>
+    html,
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    #map_container {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+    }
+    </style>
+	<link rel="stylesheet" type="text/css" href="https://api.map.baidu.com/res/webgl/10/bmap.css">
+    <script src="http://api.map.baidu.com/api?v=1.0&type=webgl&ak=Pcsg8lnesw8tS9hcziAo6FOI7LsADxUs"></script>
+    <script src="http://mapv.baidu.com/gl/examples/static/mapv.min.js"></script>
+    <script src="http://mapv.baidu.com/gl/examples/static/common.js"></script>
+	<script src="http://unpkg.com/mapvgl/dist/mapvgl.min.js"></script>
+	
+	<!-- 如果使用到Three.js相关的图层需要引用 -->
+	<script src="https://unpkg.com/mapvgl/dist/mapvgl.threelayers.min.js"></script>
+</head>
+<body>
+    <div id="map_container"></div>
+    <script>
+    /* global BMapGL */
+
+    /* global mapv */
+
+    /* global mapvgl */
+
+    /* global initMap */
+
+    var map = initMap({
+        tilt: 0
+    });
+	
+	//根据地理位置设置地图中心点
+    var point = new BMapGL.Point(120.74724,31.27924);
+    map.centerAndZoom(point, 11);
+
+    var view = new mapvgl.View({
+        effects: [
+            new mapvgl.BloomEffect({
+                threshold: 0.2,
+                blurSize: 2.0
+            }),
+        ],
+        map: map
+    });
+
+    var result = [];
+	// bj_grid20181212.csv
+    fetch('https://img.lbjheiheihei.xyz/super1.csv').then(function (rs) {
+        return rs.text();
+    }).then(function (rs) {
+        rs = rs.split('\n');
+        for (var i = 0; i < rs.length; i++) {
+            var line = rs[i].split(',');
+            result.push(line);
+        }
+        draw();
+    });
+
+    function draw() {
+        var data = [];
+        for (var i = 0; i <= result.length - 1; i++) {
+            var line = result[i];
+            data.push({
+                geometry: {
+                    type: 'POINT',
+                    coordinates: [line[1], line[2]]
+                },
+                properties: {
+                    count: 700
+                }
+            });
+        }
+
+        var whiteLayer = new mapvgl.HeatPointLayer({
+            blend: 'lighter',
+            style: 'grid',
+            shape: 'square',
+            size: 1,
+            min: 0,
+            max: 1000,
+            gradient: {
+                0: 'rgb(200, 200, 200, 0)',
+                0.2: 'rgb(200, 200, 200, 0.5)',
+                0.5: 'rgb(200, 200, 200, 0.8)',
+                0.51: 'rgb(200, 200, 200, 0)',
+                1: 'rgb(200, 200, 200, 0)'
+            }
+        });
+        var yellowLayer = new mapvgl.HeatPointLayer({
+            blend: 'lighter',
+            style: 'grid',
+            size: 4,
+            min: 0,
+            max: 1000,
+            gradient: {
+                0: 'rgb(200, 200, 200, 0)',
+                0.2: 'rgb(200, 200, 200, 0)',
+                0.5: 'rgb(226, 95, 0, 0.9)',
+                1: 'rgb(239, 209, 19, 0.9)'
+            }
+
+            /*
+            gradient: {
+                0.0: 'rgb(88, 54, 100, 0.0)',
+                0.2: 'rgb(174, 81, 174, 0.0)',
+                0.5: 'rgb(225, 108, 30, 0.8)',
+                1.0: 'rgb(241, 247, 14, 1.0)',
+            }
+            */
+        });
+        view.addLayer(yellowLayer);
+        view.addLayer(whiteLayer);
+        whiteLayer.setData(data);
+        yellowLayer.setData(data);
+		console.log(data)
+    }
+    </script>
+</body>
+</html>
