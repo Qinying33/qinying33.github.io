@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <title>all</title>
+    <title>park</title>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <style>
@@ -58,7 +58,8 @@
     });
 
     var result = [];
-    fetch('https://img.lbjheiheihei.xyz/super1.csv').then(function (rs) {
+	// bj_grid20181212.csv
+    fetch('https://img.lbjheiheihei.xyz/park.csv').then(function (rs) {
         return rs.text();
     }).then(function (rs) {
         rs = rs.split('\n');
@@ -68,30 +69,6 @@
         }
         draw();
     });
-	
-	var park_result = [];
-	fetch('https://img.lbjheiheihei.xyz/park.csv').then(function (rs) {
-	    return rs.text();
-	}).then(function (rs) {
-	    rs = rs.split('\n');
-	    for (var i = 0; i < rs.length; i++) {
-	        var line = rs[i].split(',');
-	        park_result.push(line);
-	    }
-	    draw();
-	});
-	
-	var bus_result = [];
-	fetch('https://img.lbjheiheihei.xyz/bus.csv').then(function (rs) {
-	    return rs.text();
-	}).then(function (rs) {
-	    rs = rs.split('\n');
-	    for (var i = 0; i < rs.length; i++) {
-	        var line = rs[i].split(',');
-	        bus_result.push(line);
-	    }
-	    draw();
-	});
 
     function draw() {
         var data = [];
@@ -107,34 +84,6 @@
                 }
             });
         }
-		
-		var park_data = [];
-		for (var i = 0; i <= park_result.length - 1; i++) {
-		    var line = park_result[i];
-		    park_data.push({
-		        geometry: {
-		            type: 'POINT',
-		            coordinates: [line[1], line[2]]
-		        },
-		        properties: {
-		            count: 700
-		        }
-		    });
-		}
-		
-		var bus_data = [];
-		for (var i = 0; i <= bus_result.length - 1; i++) {
-		    var line = bus_result[i];
-		    bus_data.push({
-		        geometry: {
-		            type: 'POINT',
-		            coordinates: [line[1], line[2]]
-		        },
-		        properties: {
-		            count: 700
-		        }
-		    });
-		}
 
         var whiteLayer = new mapvgl.HeatPointLayer({
             blend: 'lighter',
@@ -151,19 +100,18 @@
                 1: 'rgb(200, 200, 200, 0)'
             }
         });
-		
         var yellowLayer = new mapvgl.HeatPointLayer({
             blend: 'lighter',
             style: 'grid',
-            size: 8,
+            size: 8,  //修改这个可以改变生成光点的大小
             min: 0,
             max: 1000,
-            gradient: {
-                0: 'rgb(200, 200, 200, 0)',
-                0.2: 'rgb(200, 200, 200, 0)',
-                0.5: 'rgb(226, 95, 0, 0.9)',
-                1: 'rgb(239, 209, 19, 0.9)'
-            }
+			gradient: {
+				0: 'rgb(80, 252, 50, 0.8)',
+				0.3: 'rgb(76, 206, 117, 0.8)',
+				0.7: 'rgb(38, 148, 18, 0.8)',
+				1: 'rgb(32, 97, 4, 0.8)'
+			}
 
             /*
             gradient: {
@@ -174,44 +122,11 @@
             }
             */
         });
-		
-		var park_Layer = new mapvgl.HeatPointLayer({
-		    blend: 'lighter',
-		    style: 'grid',
-		    size: 8,
-		    min: 0,
-		    max: 1000,
-			gradient: {
-				0: 'rgb(80, 252, 50, 0.8)',
-				0.3: 'rgb(76, 206, 117, 0.8)',
-				0.7: 'rgb(38, 148, 18, 0.8)',
-				1: 'rgb(32, 97, 4, 0.8)'
-			}
-		});
-		
-		var bus_Layer = new mapvgl.HeatPointLayer({
-		    blend: 'lighter',
-		    style: 'grid',
-		    size: 8,
-		    min: 0,
-		    max: 1000,
-			gradient: { // 对应比例渐变色
-				0: 'rgb(50, 50, 256, 0.8)',
-				0.3: 'rgb(178, 202, 256, 0.8)',
-				1: 'rgb(250, 250, 256, 0.8)'
-			},
-		});
-		
-		view.addLayer(whiteLayer);
         view.addLayer(yellowLayer);
-		view.addLayer(park_Layer);
-		view.addLayer(bus_Layer);
-        
+        view.addLayer(whiteLayer);
         whiteLayer.setData(data);
         yellowLayer.setData(data);
-		park_Layer.setData(park_data);
-		bus_Layer.setData(bus_data);
-		// console.log(data)
+		//console.log(data)
     }
     </script>
 </body>
